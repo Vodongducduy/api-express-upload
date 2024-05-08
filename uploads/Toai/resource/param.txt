@@ -1,0 +1,95 @@
+        in_ind             VARCHAR2
+        in_gd_tp           VARCHAR2
+       ,  in_rhq_cd         VARCHAR2(6)
+      , in_t_lofc_cnt_cd   VARCHAR2(2) -- CR0015132
+      , in_t_lofc          VARCHAR2(6)
+      , in_trd_cd          VARCHAR2(3)
+      , in_sub_trd_cd      VARCHAR2(2)
+      , in_t_vvd           VARCHAR2(4000)
+      , in_vsl_eng_nm      SPC_SBC_MST.VSL_ENG_NM%TYPE
+      , in_vsl_opr_cd      SPC_SBC_MST.VSL_OPR_CD%TYPE
+      , in_t_dir_cd        VARCHAR2(1)
+      , in_t_rlane         VARCHAR2(5)
+      , in_t_slane         VARCHAR2(3)
+      , in_t_pol_yd        VARCHAR2(7)
+      , in_t_pod_yd        VARCHAR2(7)
+      , in_ctrt_no         VARCHAR2(50)
+      , in_ctrt_tp         VARCHAR2(7) --S : SC NO, R:RFA NO, T:TAA NO
+      , in_sbc_cust_grp_id SPC_SBC_CUST_GRP_MST.SBC_CUST_GRP_ID%TYPE
+
+      , in_dom_flg         VARCHAR2(1)
+      , in_rf_flg          VARCHAR2(1)
+      , in_dcgo_flg        VARCHAR2(1)
+      , in_rd_flg          VARCHAR2(1) --CR0013345
+      , in_ioc_cd          VARCHAR2(1)
+      , in_t_pol_cd        VARCHAR2(4000)
+      , in_t_pod_cd        VARCHAR2(4000)
+      , in_f_vvd           VARCHAR2(9)
+      , in_f_ioc           VARCHAR2(1)
+
+      , in_rcv_term_cd      VARCHAR2(1)
+      , in_de_term_cd       VARCHAR2(1)
+      , in_usa_svc_mod_cd   VARCHAR2(4)
+      , in_org_trns_mod_cd  VARCHAR2(4)
+      , in_dest_trns_mod_cd VARCHAR2(400) --CR0014251
+      , in_t_pol_cnt       VARCHAR2(4000)
+      , in_t_pol_loc       VARCHAR2(4000)
+      , in_t_pol_nod       VARCHAR2(4000)
+      , in_t_pod_cnt       VARCHAR2(4000)
+      , in_t_pod_loc       VARCHAR2(4000)
+      , in_t_pod_nod       VARCHAR2(4000)
+      , in_t_pol_clpt_ind_seq VARCHAR2(2)
+      , in_t_pod_clpt_ind_seq VARCHAR2(2)
+      , in_mty_ecc         VARCHAR2(4000)
+      , in_mty_loc         VARCHAR2(4000)
+      , in_mty_nod         VARCHAR2(4000)
+      , in_fll_rtn         VARCHAR2(4000)
+      , in_cust_tp_cd      VARCHAR2(2)
+      , in_a_cust_cd       VARCHAR2(8)
+      , in_c_cust_cd       VARCHAR2(9)
+      , in_s_cust_cd       VARCHAR2(8)
+      , in_cnee_cust_cd    VARCHAR2(8)
+      , in_cntr_tpsz_cd    VARCHAR2(4000)
+      , in_sbc_cmdt_grp_cd VARCHAR2(2)
+      , in_sbc_seq         SPC_SBC_MST.SBC_SEQ%TYPE
+      , in_bkg_no          BKG_BOOKING.BKG_NO%TYPE
+      , in_por_cnt         VARCHAR2(4000)
+      , in_por_loc         VARCHAR2(4000)
+      , in_por_nod         VARCHAR2(4000)
+      , in_del_cnt         VARCHAR2(4000)
+      , in_del_loc         VARCHAR2(4000)
+      , in_del_nod         VARCHAR2(4000)
+      , in_del_ecc         VARCHAR2(4000) --CR0014251
+
+       /******* master constraint table???? ?? ???? FOR Feeder QTY?????**************/
+	  , in_n1st_ts_prpst_cd VARCHAR2(3)--CR0016654
+      , in_ts1_vvd_pos     NUMBER
+      , in_ts1_sbc_seq     SPC_SBC_MST.SBC_SEQ%TYPE
+      , in_ts1_lane        VARCHAR2(3)
+      , in_ts1_dir_cd      VARCHAR2(1)
+      , in_ts1_vvd         VARCHAR2(4000)
+      , in_ts1_pol_cnt     VARCHAR2(4000)
+      , in_ts1_pol_loc     VARCHAR2(4000)
+      , in_ts1_pol_nod     VARCHAR2(4000)
+      , in_ts1_pod_cnt     VARCHAR2(4000)
+      , in_ts1_pod_loc     VARCHAR2(4000)
+      , in_ts1_pod_nod     VARCHAR2(4000)
+      , in_ts1_pol_clpt_ind_seq VARCHAR2(2)
+      , in_ts1_pod_clpt_ind_seq VARCHAR2(2)
+      , in_eq_yrwk_r       VARCHAR2(6)
+      , in_eq_yrwk_d       VARCHAR2(6)
+      , in_eq_hld_fm_yrwk  VARCHAR2(6)
+      , in_eq_hld_to_yrwk  VARCHAR2(6)
+      , in_xter_rqst_via_cd VARCHAR2(4000)
+      , in_hot_de_flg      VARCHAR2(1)
+      , in_ap_flg          VARCHAR2(1)--CR0013277
+      , in_xcld_ap_flg     VARCHAR2(1)--CR0013277
+      , in_pctl_no         VARCHAR2(20)
+      , in_cust_ttl_flg    VARCHAR2(1) := 'N'
+      , in_ts1_pre_post_flg VARCHAR2(1)
+      , in_add_tare_wgt_flg VARCHAR2(1)
+      , in_exac_mtch_flg   VARCHAR2(1)--CR0013345
+      , in_bkg_rf_flg          VARCHAR2(1) --CR0013345
+      , in_bkg_rd_flg          VARCHAR2(1) --CR0013345
+      , in_ca_flg          VARCHAR2(1) --CR0014482
+      , in_spc_pre_pst_flg VARCHAR2(2) /* CR0014189 */
