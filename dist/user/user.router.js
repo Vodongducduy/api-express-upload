@@ -8,7 +8,6 @@ class UserRouter {
     }
     login() {
         this.app.post("/login", this.userController.login);
-        this.app.post("/demo", this.userController.demo);
     }
 }
 exports.UserRouter = UserRouter;

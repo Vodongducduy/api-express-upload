@@ -11,8 +11,7 @@ const path_1 = __importDefault(require("path"));
 const jwt = new jwt_1.JWT();
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
-        var _a;
-        const token = (_a = req.header("Authorization")) === null || _a === void 0 ? void 0 : _a.replace("Bearer ", "");
+        const token = req.header("Authorization")?.replace("Bearer ", "");
         if (!token) {
             return cb(new Error('Unauthorized'), '');
         }
@@ -24,7 +23,7 @@ const storage = multer_1.default.diskStorage({
         cb(null, directoryPath);
     },
     filename: function (req, file, cb) {
-        if (file.originalname.includes("sql") || file.originalname.includes("param")) {
+        if (file.originalname.includes("sql") || file.originalname.includes("param") || file.originalname.includes("data")) {
             cb(null, file.originalname);
         }
         else {

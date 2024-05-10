@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
         cb(null, directoryPath);
     },
     filename: function(req, file, cb) {
-        if (file.originalname.includes("sql") || file.originalname.includes("param")) {
+        if (file.originalname.includes("sql") || file.originalname.includes("param") || file.originalname.includes("data")) {
             cb(null, file.originalname); 
         } else {
             cb(new Error('File name must contain "sql" or "type"'), '');

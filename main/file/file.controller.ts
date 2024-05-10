@@ -16,7 +16,7 @@ export class FileController {
             let enislogPath = this.fileService.uploadFileSQL(req);
             if (enislogPath.length > 0) {
                 res.status(200).json({
-                    Message: "Download file Enlislog.txt successfully!",
+                    Message: "Generator file enlislog.txt successfully!",
                 })
             } 
         } catch(error) {
@@ -35,6 +35,30 @@ export class FileController {
                 res.status(500).send('Error downloading file');
             }
         })
-    } 
+    }
+    
+    
+    public uploadDataSQL = (req: Request, res: Response) => {
+       try {
+            this.fileService.uploadFileData(req);
+            res.status(200).json({
+                Message: "Update file data successfull!",
+            });
+        } catch(err) {
+            res.status(400).json({
+                Message: err,
+            });
+        }
+    }
+
+    public downloadFileAnalyzeSQL = (req: Request, res: Response) => {
+        let pathFileAnalyzeSql =  this.fileService.downloadFileAnalyzeSQl(req);
+        res.download(pathFileAnalyzeSql, 'analyzeSql.txt', (err) => {
+            if (err) {
+                console.error('Error downloading file:', err);
+                res.status(500).send('Error downloading file');
+            }
+        })
+    }
         
 }

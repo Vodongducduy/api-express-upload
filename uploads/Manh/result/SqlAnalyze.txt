@@ -1,0 +1,128 @@
+WITH BRK_LIST AS (
+                SELECT BKG_NO, T_SLAN_CD SLAN_CD, SUBSTR(T_VVD, 1, 4) VSL_CD, SUBSTR(T_VVD, 5, 4) SKD_VOY_NO, SUBSTR(T_VVD, 9, 1) SKD_DIR_CD, T_POL_LOC_CD, T_POL_NOD_CD, T_POL_CLPT_IND_SEQ, T_POD_LOC_CD, T_POD_NOD_CD, T_POD_CLPT_IND_SEQ
+                  FROM SPC_SBC_BRK_BKG_LIST_FNC('SINE02945600', null)
+            ), COMBINED_BKG AS (
+                  SELECT B.BKG_NO
+                       , B.OB_SLS_OFC_CD
+                       , B.BKG_OFC_CD
+                       , B.CMDT_CD
+                       , K.SLAN_CD
+                       , K.VSL_CD
+                       , K.SKD_VOY_NO
+                       , K.SKD_DIR_CD
+                       , K.T_POL_LOC_CD
+                       , K.T_POL_NOD_CD
+                       , K.T_POL_CLPT_IND_SEQ
+                       , K.T_POD_LOC_CD
+                       , K.T_POD_NOD_CD
+                       , K.T_POD_CLPT_IND_SEQ
+                       , B.BKG_CTRL_PTY_CUST_CNT_CD
+                       , B.BKG_CTRL_PTY_CUST_SEQ
+                       , B.BKG_CGO_TP_CD
+                       , B.BKG_STS_CD
+                       , B.XTER_BKG_RQST_CD
+                       , B.HOT_DE_FLG
+                    FROM BRK_LIST K, BKG_BOOKING B
+                   WHERE B.BKG_NO = K.BKG_NO
+            )
+
+
+ SELECT B.BKG_NO
+                                       , CASE WHEN 'N' = 'Y'
+                                              THEN SUM(DECODE(SUBSTR(Q.EQ_SUBST_CNTR_TPSZ_CD, 1, 1), 'R', Q.EQ_SUBST_CGO_QTY, 0) + DECODE(SUBSTR(Q.CNTR_TPSZ_CD, 1, 1), 'R', Q.OP_CNTR_QTY - Q.EQ_SUBST_CGO_QTY, 0))
+											  WHEN NVL(null, 'N')='Y' AND NVL(null, 'N') = 'Y' THEN SUM(DECODE(SUBSTR( EQ_SUBST_CNTR_TPSZ_CD, 1, 1 ), 'D', DECODE(SUBSTR(EQ_SUBST_CNTR_TPSZ_CD, -1),'2',1,'3',1,2)*EQ_SUBST_CGO_QTY, 0 ) ) --CR0013345
+											  ELSE SUM(DECODE(SUBSTR(CNTR_TPSZ_CD, -1),'2',1,'3',1,2)*OP_CNTR_QTY) --CR0016353
+                                          END BKG_QTY
+                                       , SUM(Q.OP_CNTR_QTY * (SELECT TS.CNTR_TPSZ_TARE_WGT FROM MDM_CNTR_TP_SZ TS WHERE Q.CNTR_TPSZ_CD = TS.CNTR_TPSZ_CD)) * 0.001 AS BKG_TARE_WGT
+                                       , SUM(Q.OP_CNTR_QTY) AS MOV_QTY --CR0014508
+                                    FROM BKG_VVD V, VSK_VSL_PORT_SKD POL, VSK_VSL_PORT_SKD POD, BKG_BOOKING B, MDM_DTL_REV_LANE ML, SPC_OFC_LVL O, BKG_QUANTITY Q, MDM_CUSTOMER MC
+                                       , MDM_LOCATION VPOL, MDM_LOCATION VPOD , MDM_ORGANIZATION MO -- CR0015132
+                                   WHERE V.VSL_CD           = SUBSTR('PETT2418W', 1, 4)
+                                     AND V.SKD_VOY_NO       = SUBSTR('PETT2418W', 5, 4)
+                                     AND V.SKD_DIR_CD       = SUBSTR('PETT2418W', 9, 1)
+                                     AND V.SLAN_CD          = 'SX1'
+                                     AND V.VSL_CD           = POL.VSL_CD
+                                     AND V.SKD_VOY_NO       = POL.SKD_VOY_NO
+                                     AND V.SKD_DIR_CD       = POL.SKD_DIR_CD
+                                     AND V.SLAN_CD          = POL.SLAN_CD
+                                     AND V.POL_YD_CD        = POL.YD_CD
+                                     AND V.POL_CLPT_IND_SEQ = POL.CLPT_IND_SEQ
+                                     AND (POL.SKD_CNG_STS_CD != 'S' OR POL.SKD_CNG_STS_CD IS NULL)
+                                     AND POL.TURN_PORT_IND_CD NOT IN ('D', 'V', 'F') --2018.07.12 Add Virtual Port 제외.
+                                     AND V.VSL_CD            = POD.VSL_CD
+                                     AND V.SKD_VOY_NO        = POD.SKD_VOY_NO
+                                     AND V.SKD_DIR_CD        = POD.SKD_DIR_CD
+                                     AND V.SLAN_CD           = POD.SLAN_CD
+                                     AND V.POD_YD_CD         = POD.YD_CD
+                                     AND V.POD_CLPT_IND_SEQ  = POD.CLPT_IND_SEQ
+                                     AND (POD.SKD_CNG_STS_CD != 'S' OR POD.SKD_CNG_STS_CD IS NULL)
+                                     AND ML.RLANE_CD         LIKE V.SLAN_CD||'%'
+                                     AND ML.VSL_SLAN_DIR_CD  = V.SKD_DIR_CD
+                                     AND V.POL_CD = VPOL.LOC_CD
+                                     AND V.POD_CD = VPOD.LOC_CD
+                                     AND ML.FM_CONTI_CD     = VPOL.CONTI_CD
+                                     AND ML.TO_CONTI_CD     = VPOD.CONTI_CD
+                                     AND ML.IOC_CD          = DECODE(VPOL.CONTI_CD, VPOD.CONTI_CD, 'I', 'O')  -- TRUNK의 IOC
+                                     AND ML.TRD_CD           = NVL('LET', ML.TRD_CD)
+                                     AND ML.SUB_TRD_CD       = NVL('LE', ML.SUB_TRD_CD)
+                                     AND ML.DMNT_LEG_FLG     = NVL('Y', ML.DMNT_LEG_FLG)
+                                     AND ML.DELT_FLG         = 'N'
+                                     AND NVL(NVL2(null,V.VSL_PRE_PST_CD,V.SPC_VSL_PRE_PST_CD),V.VSL_PRE_PST_CD)    = 'T' /* CR0014189 */
+                                     AND V.BKG_NO            = B.BKG_NO
+                                     AND B.BKG_STS_CD        IN ('F', 'W')
+                                     AND B.BKG_CGO_TP_CD     IN ('F', 'B', 'R')
+                                     AND CASE WHEN B.BKG_OFC_CD IN ('RICHQ', 'RICBB') THEN B.BKG_OFC_CD ELSE B.IN_IND END = O.OFC_CD
+                                     AND O.DELT_FLG         = 'N'
+                                     AND B.BKG_NO           = Q.BKG_NO
+                                     AND 'O' = ML.IOC_CD -- TRUNK의 IOC
+                                     ------- loading이 sub office일 경우에는 5번, main office일 경우에는 4번에 대입 --------------
+                                     AND NVL(O.N4TH_PRNT_OFC_CD, CASE WHEN B.BKG_OFC_CD IN ('RICHQ', 'RICBB') THEN B.BKG_OFC_CD ELSE B.OB_SLS_OFC_CD END) = MO.OFC_CD -- CR0015132
+                                     AND MO.DELT_FLG = 'N' -- CR0015132
+                                     AND ( (
+                                               'T' NOT IN ('PL')
+                                               AND NVL(O.N4TH_PRNT_OFC_CD, '*') = CASE WHEN 'SINHQ' = 'RICHQ' THEN NVL(O.N4TH_PRNT_OFC_CD, '*') ELSE NVL('SHABB', NVL(O.N4TH_PRNT_OFC_CD, '*')) END
+                                               -- RICHQ로 따지는 부킹은 N4TH가 NULL임.
+                                               AND SUBSTR(MO.LOC_CD, 1, 2) = NVL('SHABB'_cnt_cd, SUBSTR(MO.LOC_CD, 1, 2))  -- CR0015132
+                                               AND NVL('CNNGB', SUBSTR(V.POL_YD_CD, 1, 5)) LIKE '%'||SUBSTR(V.POL_YD_CD, 1, 5)||'%'
+                                               AND NVL('BRSSZ', SUBSTR(V.POD_YD_CD, 1, 5)) LIKE '%'||SUBSTR(V.POD_YD_CD, 1, 5)||'%'
+                                               AND NVL(null, NVL(V.POL_CLPT_IND_SEQ, 1)) = NVL(V.POL_CLPT_IND_SEQ, 1)
+                                               AND NVL(null, NVL(V.POD_CLPT_IND_SEQ, 1)) = NVL(V.POD_CLPT_IND_SEQ, 1)
+                                           )
+                                           -- DEFAULT : 미국 : POL, 아시아 : LOADING OFFICE
+                                           OR ( 'T' = 'PL' AND 'SINHQ' =  'RICHQ' AND NVL('CNNGB', SUBSTR(V.POL_YD_CD, 1, 5)) LIKE '%'||SUBSTR(V.POL_YD_CD, 1, 5)||'%')
+                                           OR ( 'T' = 'PL' AND 'SINHQ' <> 'RICHQ' AND NVL(O.N4TH_PRNT_OFC_CD, '*') = NVL('SHABB', NVL(O.N4TH_PRNT_OFC_CD, '*')) )
+                                         )
+                                     AND EXISTS (
+                                                    SELECT 1
+                                                      FROM DUAL
+                                                     WHERE (NVL(null, '*') = '*' OR null = '00')
+
+                                                     UNION ALL
+
+                                                    SELECT 1
+                                                      FROM SPC_SBC_MST_CMDT D
+                                                     WHERE ROWNUM=1 AND null = 'XX'
+                                                       AND D.SBC_SEQ = null
+                                                       AND D.CMDT_CD = B.CMDT_CD
+
+                                                     UNION ALL
+
+                                                    SELECT 1
+                                                      FROM SPC_SBC_CMDT_MGMT D
+                                                     WHERE ROWNUM=1 AND null <> 'XX'
+                                                       AND NVL(null, '*') <> '*'
+                                                       AND D.SBC_CMDT_GRP_CD = null
+                                                       AND D.SBC_CMDT_CD     = B.CMDT_CD
+                                                       AND D.OFC_RHQ_CD      = 'SINHQ'
+                                                )
+                                     AND B.BKG_CTRL_PTY_CUST_CNT_CD    = MC.CUST_CNT_CD(+)
+                                     AND B.BKG_CTRL_PTY_CUST_SEQ       = MC.CUST_SEQ(+)
+                                     AND NVL(MC.CNTR_CUST_TP_CD, 'XX') = NVL(null, NVL(MC.CNTR_CUST_TP_CD, 'XX'))
+                                     AND B.BKG_NO NOT IN (SELECT BKG_NO FROM COMBINED_BKG)
+                                     -- Add VIA and Premeum (CR0014253)
+                                     AND ( NVL(null, 'ALL') = 'ALL'
+                                           OR (NVL(null, 'ALL') = 'OTR' AND B.XTER_BKG_RQST_CD <> 'WEQ')
+                                           OR (NVL(null, 'ALL') = 'WEQ' AND B.XTER_BKG_RQST_CD = 'WEQ')
+                                         )
+                                     AND NVL(null, B.HOT_DE_FLG) = B.HOT_DE_FLG
+                                   GROUP BY B.BKG_NO

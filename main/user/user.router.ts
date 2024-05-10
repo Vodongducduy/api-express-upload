@@ -11,6 +11,5 @@ export class UserRouter {
     
     public login() {
        this.app.post("/login",this.userController.login);
-       this.app.post("/demo", this.userController.demo)
     }
 }

@@ -13,28 +13,12 @@ export class UserController {
 
         let userDTO: UserDTO = {
             name :req.body.name,
-            id: req.body.id,
+            bkgNo: req.body.bkgNo,
         } ;
 
         let result: string = this.userService.login(userDTO);
         res.json({
             Token: result,
         })
-    }
-
-    public demo = (req: Request, res: Response) => {
-        let auth = req.headers["authorization"]?.split(" ");
-        if (auth != undefined) {
-            let token: string = auth[1];
-            try {
-                res.status(200).json({
-                    Data:this.userService.demo(token),
-                })
-            } catch (err) {
-                res.status(400).json({
-                    Message: "Unauthorization",
-                });
-            }
-        } 
     }
 }

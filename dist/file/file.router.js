@@ -13,10 +13,16 @@ class FileRouter {
         this.app = app;
     }
     uploadFile() {
-        this.app.post("/file/upload", middleware_1.default, multer_1.UploadMutler.array("files"), this.fileController.uploadFile);
+        this.app.post("/file/sql_param/upload", middleware_1.default, multer_1.UploadMutler.array("files"), this.fileController.uploadFile);
     }
     donwloadFile() {
-        this.app.get("/file/download", middleware_1.default, this.fileController.downloadFileEnislog);
+        this.app.get("/file/enis/download", middleware_1.default, this.fileController.downloadFileEnislog);
+    }
+    uploadFileDataSQl() {
+        this.app.post("/file/data/upload", middleware_1.default, multer_1.UploadMutler.single("file"), this.fileController.uploadDataSQL);
+    }
+    downloadFileAnalyzeSQL() {
+        this.app.get("/file/analyze_SQL/download", middleware_1.default, this.fileController.downloadFileAnalyzeSQL);
     }
 }
 exports.FileRouter = FileRouter;

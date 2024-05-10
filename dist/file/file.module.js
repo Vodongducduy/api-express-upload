@@ -14,6 +14,8 @@ class FileModule {
         console.log("Api handle upload and download File is start");
         this.fileRouter.uploadFile();
         this.fileRouter.donwloadFile();
+        this.fileRouter.uploadFileDataSQl();
+        this.fileRouter.downloadFileAnalyzeSQL();
     }
 }
 exports.FileModule = FileModule;

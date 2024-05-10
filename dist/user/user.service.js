@@ -9,13 +9,5 @@ class UserService {
     login(userDTO) {
         return this.jwt.generateJWT(userDTO);
     }
-    demo(token) {
-        try {
-            return this.jwt.verifyJWT(token);
-        }
-        catch (err) {
-            return err;
-        }
-    }
 }
 exports.UserService = UserService;
