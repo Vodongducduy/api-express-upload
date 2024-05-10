@@ -132,7 +132,7 @@ function setEnisLog(name: string,in_bkg_no: string,files :Express.Multer.File[])
         if (data.includes(`in_param.${arryField[i]}`) && !myMap.has(arryField[i])) {
             steam.write(`ENIS_LOG_PRC(SYSDATE,'SPC_SBC_FNC','Param:${arryField[i]}:'||in_param.${arryField[i]},'${in_bkg_no}');\n`)
         } else if (data.includes(arryField[i]) && !myMap.has(arryField[i])) {
-            steam.write(`ENIS_LOG_PRC(SYSDATE,'SPC_SBC_FNC','Param:${arryField[i]}:'||${arryField[i]},'${in_bkg_no}');\n`);
+            steam.write(`ENIS_LOG_PRC(SYSDATE,'SPC_SBC_FNC','Param:param|${arryField[i]}:'||${arryField[i]},'${in_bkg_no}');\n`);
         }
     }
     steam.end();
